@@ -1,0 +1,332 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* shadcn: the grid background reads this variable. */
+:root {
+  --muted-foreground: #8f949b;
+}
+
+@layer base {
+  :root {
+    /* The field is paper, so every hairline is navy at low alpha. Sections on
+       navy carry their own `border-white/*` rules instead of these. */
+    --paper: #ffffff;
+    --ink: #0b1f3c;
+    --signal: #14999c;
+    --protect: #fc7a5c;
+    --line: rgba(11, 31, 60, 0.14);
+    --line-soft: rgba(11, 31, 60, 0.07);
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: auto;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink;
+    font-size: 1rem;
+    overflow-x: hidden;
+  }
+
+  /* Lenis */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  ::selection {
+    background: rgba(252, 122, 92, 0.55);
+    color: #0b1f3c;
+  }
+
+  /* Visible focus — accessibility is not optional. Teal reads on both fields. */
+  :focus-visible {
+    outline: 2px solid var(--signal);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Native cursor, mobile menus and every canvas loop respect this. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* ---------- layout ---------- */
+  .shell {
+    @apply mx-auto w-full max-w-shell px-6 md:px-10 lg:px-[72px];
+  }
+
+  /* ---------- type ---------- */
+  .t-eyebrow {
+    @apply font-mono text-meta uppercase text-muted;
+  }
+  .t-meta {
+    @apply font-mono text-meta uppercase;
+  }
+  /* Bebas Neue has one weight; bold would be a synthesised smear. */
+  .t-hero {
+    @apply font-bebas text-hero font-normal uppercase;
+  }
+  .t-section {
+    @apply font-display text-section font-bold;
+  }
+  .t-sub {
+    @apply font-display text-sub font-medium;
+  }
+  .t-lede {
+    @apply text-lede text-ink/75;
+  }
+  .t-readout {
+    @apply font-mono text-readout font-medium;
+  }
+
+  /* ---------- rules ---------- */
+  /* On paper. Sections on navy carry their own rules in white. */
+  .rule {
+    @apply h-px w-full bg-[var(--line)];
+  }
+  .rule-soft {
+    @apply h-px w-full bg-[var(--line-soft)];
+  }
+  .rule-dark {
+    @apply h-px w-full bg-white/15;
+  }
+  .rule-dark-soft {
+    @apply h-px w-full bg-white/[0.075];
+  }
+
+  /* ---------- status chip: the console's wayfinding mark ---------- */
+  .chip {
+    @apply inline-flex items-center gap-2.5 border border-[var(--line)] px-3 py-1.5 font-mono text-meta uppercase text-muted;
+  }
+  .chip-dark {
+    @apply inline-flex items-center gap-2.5 border border-white/20 px-3 py-1.5 font-mono text-meta uppercase text-white/60;
+  }
+  .chip-dot {
+    @apply h-[6px] w-[6px] shrink-0 rounded-full bg-signal;
+  }
+  .chip-dot--idle {
+    @apply bg-hush;
+  }
+  .chip-dot--protect {
+    @apply bg-protect;
+  }
+  /* The one small circle a section is allowed. */
+  .chip-dot--mark {
+    @apply bg-protect;
+  }
+
+  /* ---------- buttons (rectangular, never pills) ----------
+     Navy fill and navy outline on paper, white outline on navy. Coral is not
+     available as a button: it is the section marker, and a second call to
+     action competing with the first is exactly what it must not become. */
+  .btn {
+    @apply inline-flex min-h-[48px] items-center gap-3 bg-ink px-6 py-4 font-mono text-meta uppercase text-paper transition-colors duration-300 ease-calm hover:bg-signal hover:text-ink;
+  }
+  .btn-ghost {
+    @apply inline-flex min-h-[48px] items-center gap-3 border border-ink/30 px-6 py-4 font-mono text-meta uppercase text-ink transition-colors duration-300 ease-calm hover:border-ink hover:bg-ink hover:text-paper;
+  }
+  .btn-dark {
+    @apply inline-flex min-h-[48px] items-center gap-3 border border-white/45 px-6 py-4 font-mono text-meta uppercase text-paper transition-colors duration-300 ease-calm hover:border-paper hover:bg-paper hover:text-ink;
+  }
+
+  /* ---------- links ---------- */
+  .link-underline {
+    @apply relative inline-block;
+  }
+  .link-underline::after {
+    content: '';
+    @apply absolute -bottom-0.5 left-0 h-px w-full origin-right scale-x-0 bg-current transition-transform duration-500 ease-calm;
+  }
+  .link-underline:hover::after {
+    @apply origin-left scale-x-100;
+  }
+}
+
+@layer utilities {
+  /* Extremely low-opacity grain. Keeps the surface from reading as flat screen. */
+  .grain::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Technical grid — the room's drafting surface, in navy. */
+  .tech-grid {
+    background-image: linear-gradient(to right, rgba(11, 31, 60, 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(11, 31, 60, 0.045) 1px, transparent 1px);
+    background-size: 84px 84px;
+  }
+  /* The same grid on a navy section. */
+  .tech-grid-dark {
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+    background-size: 84px 84px;
+  }
+
+  /* Word-mask reveal: each line clips its own content upward. */
+  .line-mask {
+    display: block;
+    overflow: hidden;
+  }
+  .line-mask > span {
+    display: block;
+    will-change: transform;
+  }
+  /* Headings are authored one authored line per mask, so from `md` up a mask
+     line must not wrap — a wrapped line inside an `overflow: hidden` box is
+     silently clipped, which is how the hero headline lost half of itself.
+     Below `md` the type is small enough to wrap, and wrapping is safer there
+     than an overflowing line, so this is deliberately breakpoint-scoped. */
+  @media (min-width: 768px) {
+    .line-mask > span {
+      white-space: nowrap;
+    }
+  }
+
+  /* Telemetry numerals get tabular figures so counters don't reflow. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  .no-cursor {
+    cursor: none;
+  }
+}
+
+/* Slow marquee for the model strip; stops under reduced motion. */
+@keyframes marquee-x {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.marquee-track {
+  animation: marquee-x 32s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
+/* Echo ripples spreading from the answer. */
+@keyframes echo-ping {
+  0% {
+    transform: scale(0.15);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+.echo-ring {
+  animation: echo-ping 4.8s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .echo-ring {
+    animation: none;
+    opacity: 0.4;
+  }
+}
+
+/* Colour blocks (teal, coral, gray): anything built for white is re-pointed so
+   it never disappears into its own background. Cards keep their own fills. */
+@layer utilities {
+  [data-tone] .text-muted,
+  [data-tone] .text-hush {
+    color: rgba(11, 31, 60, 0.78);
+  }
+  [data-tone] .text-signal {
+    color: #0b1f3c;
+  }
+  [data-tone] .bg-signal:not(.btn):not(section):not([data-wipe]) {
+    background-color: #0b1f3c;
+  }
+  [data-tone] .text-ink\/60,
+  [data-tone] .text-ink\/65,
+  [data-tone] .text-ink\/70 {
+    color: rgba(11, 31, 60, 0.88);
+  }
+  [data-tone] .btn:hover {
+    background-color: #ffffff;
+    color: #0b1f3c;
+  }
+  [data-tone] input,
+  [data-tone] select,
+  [data-tone] textarea {
+    background-color: #ffffff;
+  }
+}
+
+/* A band that the page turned navy: light-designed content reads as white-on-navy,
+   while cards (white surfaces) keep navy text. */
+@layer utilities {
+  [data-dark] .text-ink { color: #fff; }
+  [data-dark] .text-ink\/60,
+  [data-dark] .text-ink\/65,
+  [data-dark] .text-ink\/70,
+  [data-dark] .text-ink\/75,
+  [data-dark] .text-ink\/80,
+  [data-dark] .text-ink\/85 { color: rgba(255, 255, 255, 0.78); }
+  [data-dark] .border-ink\/25,
+  [data-dark] .border-ink\/30,
+  [data-dark] .border-ink\/10 { border-color: rgba(255, 255, 255, 0.2); }
+  [data-dark] .bg-paper, [data-dark] .bg-wash { color: #0b1f3c; }
+  [data-dark] .bg-paper .text-ink, [data-dark] .bg-wash .text-ink { color: #0b1f3c; }
+  [data-dark] .bg-paper .text-ink\/60, [data-dark] .bg-paper .text-ink\/70, [data-dark] .bg-paper .text-ink\/80,
+  [data-dark] .bg-wash .text-ink\/70 { color: rgba(11, 31, 60, 0.75); }
+}
+@layer utilities {
+  [data-dark] .bg-wash .text-ink\/60, [data-dark] .bg-wash .text-ink\/65, [data-dark] .bg-wash .text-ink\/75,
+  [data-dark] .bg-wash .text-ink\/80, [data-dark] .bg-wash .text-ink\/85 { color: rgba(11, 31, 60, 0.8); }
+}
+@layer utilities {
+  [data-dark] .bg-wash { background-color: #fff; }
+  [data-dark] .border-\[var\(--line\)\] { border-color: rgba(255, 255, 255, 0.2); }
+  [data-dark] .bg-wash.border-\[var\(--line\)\] { border-color: rgba(11, 31, 60, 0.15); }
+}
+
+/* Entry animation for page-hero text: rises and un-blurs, staggered by inline delay. */
+@keyframes hero-in {
+  from { opacity: 0; transform: translateY(26px); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+.hero-in { opacity: 0; animation: hero-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+@media (prefers-reduced-motion: reduce) { .hero-in { opacity: 1; animation: none; } }

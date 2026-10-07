@@ -1,0 +1,152 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Docs — Prexi Integration Guide</title><meta name="description" content="Integration guide">
+<meta property="og:title" content="Docs — Prexi Integration Guide"><meta property="og:description" content="Integration guide">
+<meta name="theme-color" content="#0B1F3C">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css"></head><body>
+<a class="skip" href="#main">Skip to content</a><header class="hdr"><div class="wrap"><a class="logo" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 21 12 3l9 18M7.5 14h9"/></svg><span>Prexi</span></a><nav class="nav" aria-label="Primary"><div class="dd"><button type="button" aria-haspopup="true">Product ▾</button><div class="dd-menu"><a href="product.html">Context Classifier</a><a href="product.html#compress">History Compressor</a><a href="product.html#cache">Semantic Cache</a><a href="product.html#protect">Protected Zones</a><a href="product.html#mcp">MCP Server</a><a href="product.html#proxy">OpenAI Proxy</a></div></div><div class="dd"><button type="button" aria-haspopup="true">Solutions ▾</button><div class="dd-menu"><a href="solutions-customer-support.html">Customer Support</a><a href="solutions-coding-assistants.html">Coding Assistants</a><a href="solutions-ai-agents.html">AI Agents</a><a href="enterprise.html">Enterprise</a></div></div><a href="research.html">Research</a><a href="docs.html" aria-current="page">Docs</a><a href="pricing.html">Pricing</a><a href="blog.html">Blog</a><a href="changelog.html">Changelog</a></nav><div class="hdr-cta"><a class="btn-ghost" href="login.html">Sign In</a><a class="btn-ghost" href="enterprise.html">Enterprise</a><a class="btn" href="pricing.html#get-key">Get API Key</a></div><button class="menu-btn" type="button" aria-expanded="false">MENU</button></div></header><div class="drawer"><h4>Product</h4><a href="product.html">Context Classifier</a><a href="product.html#compress">History Compressor</a><a href="product.html#cache">Semantic Cache</a><a href="product.html#protect">Protected Zones</a><a href="product.html#mcp">MCP Server</a><a href="product.html#proxy">OpenAI Proxy</a><h4>Solutions</h4><a href="solutions-customer-support.html">Customer Support</a><a href="solutions-coding-assistants.html">Coding Assistants</a><a href="solutions-ai-agents.html">AI Agents</a><a href="enterprise.html">Enterprise</a><h4>More</h4><a href="research.html">Research</a><a href="docs.html">Docs</a><a href="pricing.html">Pricing</a><a href="blog.html">Blog</a><a href="changelog.html">Changelog</a><a class="btn-coral btn" style="color:#0B1F3C;background:#FC7A5C" href="pricing.html#get-key">Get API Key</a></div><main id="main"><div class="wrap docs"><aside class="side" aria-label="Docs navigation"><h5>Getting Started</h5><a href="#quickstart">Quick Start</a><a href="#authentication">Authentication</a><a href="#free-tier">Free Tier &amp; Limits</a><h5>Integration</h5><a href="#openai-proxy">OpenAI Proxy</a><a href="#mcp-server">MCP Server</a><a href="#direct-api">Direct API</a><a href="#python">Python SDK</a><h5>API Reference</h5><a href="#compress-endpoint">POST /compress</a><a href="#proxy-endpoint">POST /v1/chat/completions</a><a href="#usage-endpoint">GET /usage</a><h5>Configuration</h5><a href="#response-headers">Response Headers</a><a href="#protected-zones">Protected Zones</a><a href="#rate-limits">Rate Limits</a><a href="#domains">Supported Domains</a><h5>Guides</h5><a href="#cursor-guide">Cursor Setup</a><a href="#claude-desktop">Claude Desktop</a><a href="#windsurf-guide">Windsurf Setup</a></aside><div><div class="eb-row"><span class="ln"></span><span class="lb">Prexi › Documentation</span></div><h1 class="t-sec m" style="margin-bottom:20px">Integration Guide</h1>
+<p class="lead" style="margin-top:0">Prexi sits between your application and any LLM. Three integration paths: OpenAI-compatible proxy (recommended), native MCP server, or direct REST API.</p>
+<div class="callout"><b>Free Tier Active</b><span>10M tokens/month at no cost. No credit card required.</span><a href="pricing.html#get-key">Get your API key →</a></div>
+
+<section class="dsec" id="quickstart"><h2>Quick Start</h2><p>The fastest path: change one URL in your existing OpenAI client. Your code stays exactly the same — Prexi intercepts, classifies, compresses, and forwards to your LLM.</p>
+<h3>Step 1 — Get your API key</h3><p>Request a free key at <a href="pricing.html#get-key" style="text-decoration:underline">Prexi.ai/pricing</a>. It arrives by email within 60 seconds.</p>
+<h3>Step 2 — Point your client at Prexi</h3>
+<div class="code"><div class="bar"><span>JavaScript / TypeScript</span><button type="button">Copy</button></div><pre><code>import OpenAI from 'openai'
+const client = new OpenAI({
+ apiKey: process.env.OPENAI_API_KEY, // your existing LLM key
+ baseURL: 'https://api.Prexi.ai/v1',
+ defaultHeaders: {
+'x-echoregent-key': process.env.ECHOREGENT_KEY, // your EchoRegent key
+ }
+})
+// Everything else stays identical
+const response = await client.chat.completions.create({
+ model: 'gpt-4o',
+ messages: conversationHistory // Prexi compresses this automatically
+})</code></pre></div>
+<div class="code"><div class="bar"><span>Python</span><button type="button">Copy</button></div><pre><code>from openai import OpenAI
+client = OpenAI(
+ api_key="sk-...", # your existing LLM key
+ base_url="https://api.Prexi.ai/v1",
+ default_headers={
+"x-echoregent-key": "your-echoregent-key"
+ }
+)
+# Your calls stay identical
+response = client.chat.completions.create(
+ model="gpt-4o",
+ messages=conversation_history
+)</code></pre></div>
+<h3>Step 3 — Read what was saved</h3><p>Every response includes Prexi headers showing exactly what happened:</p>
+<div class="code"><div class="bar"><span>Response headers</span><button type="button">Copy</button></div><pre><code>x-echoregent-tokens-saved: 1,842
+x-echoregent-domain: coding
+x-echoregent-intent: debugging
+x-echoregent-compression-pct: 67
+x-echoregent-cache-hit: false
+x-echoregent-protected: false</code></pre></div></section>
+
+<section class="dsec" id="authentication"><h2>Authentication</h2><p>Prexi uses two separate keys: your Prexi key for billing and rate limiting, and your LLM provider key which is forwarded to the upstream model.</p>
+<div class="mt-s" style="margin-top:20px"><div class="tbl-wrap"><table><thead><tr><th>Header</th><th>Value</th><th>Purpose</th></tr></thead><tbody><tr><td><code>x-echoregent-key</code></td><td>Your Prexi API key</td><td>Billing, rate limit, quota</td></tr><tr><td><code>x-llm-key</code></td><td>Your LLM provider key (OpenAI, etc.)</td><td>Forwarded to upstream model</td></tr><tr><td><code>x-llm-provider</code></td><td>openai · anthropic · gemini</td><td>Which provider to route to</td></tr></tbody></table></div></div>
+<p>When using the OpenAI-compatible proxy, your LLM key is passed as <code>Authorization: Bearer sk-...</code> and Prexi forwards it transparently to the upstream model. It is never stored.</p></section>
+
+<section class="dsec" id="free-tier"><h2>Free Tier &amp; Limits</h2><div class="tbl-wrap"><table><thead><tr><th>Tier</th><th>Monthly tokens</th><th>Rate limit</th><th>Price</th></tr></thead><tbody><tr><td>Free</td><td>10M</td><td>60 req/min</td><td>$0</td></tr><tr><td>Starter</td><td>50M</td><td>200 req/min</td><td>$199/mo</td></tr><tr><td>Pro</td><td>250M</td><td>500 req/min</td><td>$499/mo</td></tr><tr><td>Agency</td><td>Unlimited</td><td>Custom</td><td>$999/mo</td></tr></tbody></table></div>
+<p>Token counts refer to tokens saved, not tokens processed. The demo endpoint (<code>/demo/compress</code>) allows up to 20 requests/minute per IP without an API key — for testing only.</p></section>
+
+<section class="dsec" id="openai-proxy"><h2>OpenAI Proxy</h2><p>The recommended integration. Prexi exposes a fully OpenAI-compatible <code>/v1/chat/completions</code> endpoint. Change your baseURL — nothing else changes in your codebase.</p>
+<p><span class="method">POST</span><code>/v1/chat/completions</code></p><p>Prexi intercepts the request, runs the classify + compress pipeline on messages, then forwards the compressed payload to your upstream model. The response you receive is identical to what your LLM returns — Prexi adds its headers and steps aside.</p>
+<h3>Supported providers via proxy</h3><ul class="plain"><li>OpenAI (GPT-4o, GPT-4o-mini, o1, o3)</li><li>Anthropic (Claude 3.5, Claude Sonnet 4.6)</li><li>Google (Gemini 2.0 Flash, Gemini 1.5 Pro)</li><li>Mistral, Groq, Together, or any OpenAI-compatible endpoint</li></ul>
+<h3>Specifying a non-OpenAI provider</h3><div class="code"><div class="bar"><span>Route to Anthropic via proxy</span><button type="button">Copy</button></div><pre><code>const client = new OpenAI({
+ apiKey: process.env.ANTHROPIC_KEY,
+ baseURL: 'https://api.Prexi.ai/v1',
+ defaultHeaders: {
+'x-echoregent-key': process.env.ECHOREGENT_KEY,
+'x-llm-provider': 'anthropic',
+ }
+})</code></pre></div></section>
+
+<section class="dsec" id="mcp-server"><h2>MCP Server</h2><p>Prexi ships a native MCP (Model Context Protocol) server. Four tools are available immediately — compress, classify, remember, and recall. Works with Claude Desktop, Cursor, Windsurf, and any MCP client.</p>
+<h3>Available MCP Tools</h3><div class="tbl-wrap"><table><thead><tr><th>Tool</th><th>Description</th><th>Input</th></tr></thead><tbody><tr><td><code>compress</code></td><td>Compress conversation history</td><td>messages array</td></tr><tr><td><code>classify</code></td><td>Classify domain, intent, risk</td><td>message text</td></tr><tr><td><code>remember</code></td><td>Store a fact in semantic memory</td><td>key, value, session</td></tr><tr><td><code>recall</code></td><td>Retrieve semantically similar facts</td><td>query, session</td></tr></tbody></table></div></section>
+
+<section class="dsec" id="direct-api"><h2>Direct API</h2><p>Call Prexi directly without going through the proxy. Useful when you want to pre-process context before assembling your LLM request.</p></section>
+
+<section class="dsec" id="python"><h2>Python SDK</h2><p>See the Python example in <a href="#quickstart" style="text-decoration:underline">Quick Start</a>.</p></section>
+
+<section class="dsec" id="compress-endpoint"><h2>POST /compress</h2><p><span class="method">POST</span><code>https://api.Prexi.ai/compress</code></p><p>Requires <code>Authorization: Bearer &lt;your-echoregent-key&gt;</code> header.</p>
+<div class="code"><div class="bar"><span>Request body</span><button type="button">Copy</button></div><pre><code>{
+  "messages": [
+    { "role": "user", "content": "..." },
+    { "role": "assistant", "content": "..." }
+  ],
+  "options": {
+    "maxTokens": 4096, // optional target window
+    "preserveLast": 2 // always keep last N turns uncompressed
+  }
+}</code></pre></div>
+<div class="code"><div class="bar"><span>Response</span><button type="button">Copy</button></div><pre><code>{
+  "compressed": [ /* compressed messages array */ ],
+  "domain": "coding",
+  "intent": "debugging",
+  "tokensSaved": 1842,
+  "compressionPct": 67,
+  "protected": false,
+  "cacheHit": false
+}</code></pre></div></section>
+
+<section class="dsec" id="proxy-endpoint"><h2>POST /v1/chat/completions</h2><p><span class="method">POST</span><code>https://api.Prexi.ai/v1/chat/completions</code></p>
+<p>Fully OpenAI-compatible. Accepts the exact same body as <code>openai.chat.completions.create()</code>. Prexi compresses the messages field, then forwards to your upstream model. Returns the upstream response unmodified plus Prexi headers.</p>
+<p>Additional headers required:</p><ul class="plain"><li><code>x-echoregent-key</code> — your EchoRegent key</li><li><code>x-llm-key</code> — your upstream LLM API key (optional if using Authorization: Bearer)</li><li><code>x-llm-provider</code> — openai (default) · anthropic · gemini</li></ul></section>
+
+<section class="dsec" id="usage-endpoint"><h2>GET /usage</h2><p><span class="method">GET</span><code>/usage</code></p></section>
+
+<section class="dsec" id="response-headers"><h2>Response Headers</h2><div class="tbl-wrap"><table><thead><tr><th>Header</th><th>Type</th><th>Description</th></tr></thead><tbody><tr><td><code>x-echoregent-tokens-saved</code></td><td>integer</td><td>Tokens removed from context</td></tr><tr><td><code>x-echoregent-compression-pct</code></td><td>integer 0–100</td><td>% reduction in context length</td></tr><tr><td><code>x-echoregent-domain</code></td><td>string</td><td>Detected conversation domain</td></tr><tr><td><code>x-echoregent-intent</code></td><td>string</td><td>Detected intent</td></tr><tr><td><code>x-echoregent-cache-hit</code></td><td>boolean</td><td>Whether response came from semantic cache</td></tr><tr><td><code>x-echoregent-protected</code></td><td>boolean</td><td>True if compression was disabled (medical/legal/crisis)</td></tr></tbody></table></div></section>
+
+<section class="dsec" id="protected-zones"><h2>Protected Zones</h2><p>Three conversation types are architecturally protected from compression:</p>
+<div class="card bd" style="margin-top:20px"><span class="eyebrow">Protected — compression disabled</span><p style="margin-top:12px">When the classifier detects one of these domains, the compression step is skipped entirely. The full context is forwarded. These zones cannot be overridden by API callers.</p>
+<div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><span class="tag fill">Medical</span><span class="tag fill">Legal</span><span class="tag fill">Crisis</span></div></div>
+<p>Protected conversations return <code>x-echoregent-protected: true</code> and are not counted toward your quota.</p></section>
+
+<section class="dsec" id="rate-limits"><h2>Rate Limits</h2><p>Rate limits are per API key, per minute. Exceeding the limit returns HTTP 429 with a <code>Retry-After</code> header.</p>
+<div style="margin-top:20px"><div class="tbl-wrap"><table><thead><tr><th>Tier</th><th>Requests/min</th><th>Burst</th></tr></thead><tbody><tr><td>Demo (no key)</td><td>20 / IP</td><td>—</td></tr><tr><td>Free</td><td>60</td><td>80</td></tr><tr><td>Starter</td><td>200</td><td>300</td></tr><tr><td>Pro</td><td>500</td><td>700</td></tr><tr><td>Agency</td><td>Custom</td><td>Custom</td></tr></tbody></table></div></div></section>
+
+<section class="dsec" id="domains"><h2>Supported Domains</h2><p>The classifier returns one of these domain values per conversation turn:</p>
+<ul class="plain"><li><code>coding</code> — software development, debugging, code review</li><li><code>medical</code> — health, symptoms, medications <span class="tag fill">⬥ Protected</span></li><li><code>legal</code> — contracts, compliance, advice <span class="tag fill">⬥ Protected</span></li><li><code>crisis</code> — mental health, emergency <span class="tag fill">⬥ Protected</span></li><li><code>customer_support</code> — tickets, complaints, returns</li><li><code>sales</code> — outreach, negotiation, CRM</li><li><code>finance</code> — budgeting, investing, accounting</li><li><code>education</code> — tutoring, explanations</li><li><code>creative</code> — writing, brainstorming, ideation</li><li><code>general</code> — catch-all for uncategorized</li></ul></section>
+
+<section class="dsec" id="cursor-guide"><h2>Cursor Setup</h2><p>Add to your <code>~/.cursor/mcp.json</code>:</p>
+<div class="code"><div class="bar"><span>~/.cursor/mcp.json</span><button type="button">Copy</button></div><pre><code>{
+  "mcpServers": {
+    "Prexi": {
+      "url": "https://api.Prexi.ai/mcp",
+      "headers": {
+        "x-echoregent-key": "your-echoregent-key"
+      }
+    }
+  }
+}</code></pre></div></section>
+
+<section class="dsec" id="claude-desktop"><h2>Claude Desktop Setup</h2>
+<div class="code"><div class="bar"><span>claude_desktop_config.json</span><button type="button">Copy</button></div><pre><code>{
+  "mcpServers": {
+    "Prexi": {
+      "command": "npx",
+      "args": ["-y", "@echoregent/mcp-server"],
+      "env": { "ECHOREGENT_KEY": "your-key" }
+    }
+  }
+}</code></pre></div></section>
+
+<section class="dsec" id="windsurf-guide"><h2>Windsurf Setup</h2><p>Add to your Windsurf MCP configuration file at <code>~/.windsurf/mcp_config.json</code>:</p>
+<div class="code"><div class="bar"><span>~/.windsurf/mcp_config.json</span><button type="button">Copy</button></div><pre><code>{
+"servers": {
+"Prexi": {
+"serverUrl": "https://api.Prexi.ai/mcp",
+"auth": {
+"type": "header",
+"header": "x-echoregent-key",
+"value": "your-echoregent-key"
+ }
+ }
+ }
+}</code></pre></div></section>
+
+<div class="card bd" style="margin-top:20px"><h3 class="t-card">Need help?</h3><p style="margin-top:10px">Email <a href="mailto:team@yudi.co.in" style="text-decoration:underline">team@yudi.co.in</a> — we respond within 24 hours. For enterprise support and SLAs, see the <a href="enterprise.html" style="text-decoration:underline">Enterprise page</a>.</p></div></div></div></main><footer class="ftr"><div class="wrap"><div class="top"><div><div class="bn">Prexi</div><p class="d">The context management layer that gives LLMs what remains. Built by Yudi Labs, Hyderabad.</p></div><div><h6>Product</h6><ul><li><a href="product.html">Overview</a></li><li><a href="product.html#classify">Classifier</a></li><li><a href="product.html#compress">Compressor</a></li><li><a href="product.html#cache">Cache</a></li><li><a href="product.html#protect">Protected Zones</a></li><li><a href="product.html#mcp">MCP Server</a></li></ul></div><div><h6>Solutions</h6><ul><li><a href="solutions-customer-support.html">Customer Support</a></li><li><a href="solutions-coding-assistants.html">Coding Assistants</a></li><li><a href="solutions-ai-agents.html">AI Agents</a></li><li><a href="enterprise.html">Enterprise</a></li></ul></div><div><h6>Resources</h6><ul><li><a href="research.html">Research</a></li><li><a href="docs.html">Documentation</a></li><li><a href="blog.html">Blog</a></li><li><a href="changelog.html">Changelog</a></li><li><a href="security.html">Security</a></li><li><a href="https://github.com/ashy5454/echoregent">GitHub ↗</a></li></ul></div><div><h6>Company</h6><ul><li><a href="about.html">About</a></li><li><a href="enterprise.html">Enterprise</a></li><li><a href="security.html">Security</a></li><li><a href="mailto:team@yudi.co.in">Contact</a></li></ul></div></div><div class="bot"><span>© 2026 Prexi · A product by Yudi Labs, Hyderabad, India</span><nav><a href="security.html">Privacy</a><a href="security.html">Terms</a><a href="security.html">Security</a><a href="mailto:team@yudi.co.in">team@yudi.co.in</a></nav></div></div></footer><script src="assets/site.js"></script></body></html>
